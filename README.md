@@ -1,6 +1,7 @@
 # SpinalTap
 
-TODO: Write a gem description
+Spinal tap lets you easily connect into running ruby processes such as
+daemons and cron scripts.  With great power comes great responsibility.
 
 ## Installation
 

@@ -4,8 +4,8 @@ require File.expand_path('../lib/spinal_tap/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Chad Remesch"]
   gem.email         = ["chad@remesch.com"]
-  gem.description   = %q{Backdoor into your long running ruby processes}
-  gem.summary       = %q{Spinal tap lets you easily connect into running ruby processes such as daemons and cron scripts for debugging purposes.  With great power comes great responsibility.}
+  gem.description   = %q{Backdoor into your long running ruby processes.}
+  gem.summary       = %q{Spinal tap lets you easily connect into running ruby processes such as daemons and cron scripts.  With great power comes great responsibility.}
   gem.homepage      = "http://github.com/chadrem/spinal_tap"
 
   gem.files         = `git ls-files`.split($\)
@@ -14,4 +14,9 @@ Gem::Specification.new do |gem|
   gem.name          = "spinal_tap"
   gem.require_paths = ["lib"]
   gem.version       = SpinalTap::VERSION
+
+  gem.add_dependency('eventmachine', ['>= 0'])
+
+  gem.add_development_dependency('rake', ['>= 0'])
+  gem.add_development_dependency('rspec', ['= 2.11'])
 end
