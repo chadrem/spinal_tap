@@ -24,17 +24,17 @@ Start spinal when your long running process starts up:
     SpinalTap.start
 
 By default it will listen for TCP connections on 127.0.0.1:9000.
-You should be able to telnet into your process and type 'help' to view
-the default list of commands.
+You should be able to telnet into your process and type 'help' to view the default list of commands.
+Spinal Tap uses threads so that it runs in the background of your application.
+
+SpinalTap.start accepts the following options:
+
+    :host => The address to listen on (default: 127.0.0.1).
+    :port => The port to listen on (default: 9000).
 
 You can stop the spinal tap server at any time:
 
     SpinalTap.stop
-
-SpinalTap.start accepts options:
-
-    :host => The address to listen on (default: 127.0.0.1).
-    :port => The port to listen on (default: 9000).
 
 # Contributing to Spinal Tap:
 
