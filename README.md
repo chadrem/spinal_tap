@@ -1,7 +1,7 @@
 # SpinalTap
 
 Spinal tap lets you easily connect into running ruby processes such as
-daemons and cron scripts.  With great power comes great responsibility.
+daemons and cron scripts.
 
 ## Installation
 
@@ -19,13 +19,13 @@ Or install it yourself as:
 
 ## Basic Usage
 
-Start spinal when your long running process starts up:
+Start spinal at the beginning of your long running process:
 
     SpinalTap.start
 
 By default it will listen for TCP connections on 127.0.0.1:9000.
-You should be able to telnet into your process and type 'help' to view the default list of commands.
-Spinal Tap uses threads so that it runs in the background of your application.
+You can then telnet into your process and type 'help' to view the default list of commands.
+Spinal Tap uses threads to run in the background of your process.
 
 SpinalTap.start accepts the following options:
 
@@ -35,6 +35,13 @@ SpinalTap.start accepts the following options:
 You can stop the spinal tap server at any time:
 
     SpinalTap.stop
+
+## Security
+
+With great power comes great responsibility.
+Currently no authentication exists so anyone who can connect to Spinal Tap has complete control over your process.
+This includes changing memory, reloading classes, killing the process, and pretty much any other nasty thing you can with Ruby's 'eval' method.
+Use at your own risk!  You have been warned!
 
 # Contributing to Spinal Tap:
 
