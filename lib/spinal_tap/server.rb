@@ -3,44 +3,56 @@ require 'socket'
 module SpinalTap
 
   class Server
-    def self.start(params = {})
-      return false if @server
-
-      @server = SpinalTap::Server.new(params).start
-
-      true
-    end
-
-    def self.stop
-      return false unless @server
-
-      @server.stop
-      @server = nil
-
-      true
-    end
-
     def initialize(params = {})
       @host = params[:host] || '127.0.0.1'
       @port = params[:port] || 9000
 
       @run = false
+      @workers = {}
+      @workers_lock = Mutex.new
     end
 
     def start
-      @run = true
+      return false if @running
 
-      @server_sock = TCPServer.new(@host, @port)
+      @running = true
 
-      Thread.new do
+      @listener_thread = Thread.new do
+        @server_sock = TCPServer.new(@host, @port)
+
         while true
           Thread.new(@server_sock.accept) do |client|
-            client.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
-            client.extend(SpinalTap::ClientHelpers)
+            begin
+              @workers_lock.synchronize do
+                @workers[Thread.current] = client
+              end
 
-            process(client)
+              client.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+              client.extend(SpinalTap::ClientHelpers)
+
+              process(client)
+            rescue Exception => e
+              puts("WORKER DIED: #{exception_to_s(e)}")
+            end
           end
         end
+      end
+
+      true
+    end
+
+    def stop
+      return false unless @running
+
+      Thread.kill(@listener_thread)
+      @server_sock.close
+
+      true
+    end
+
+    def workers
+      @workers_lock.synchronize do
+        return @workers.clone
       end
     end
 
@@ -68,7 +80,12 @@ module SpinalTap
         client.prompt
       end
 
-      puts 'going to die now'
+    ensure
+      client.close unless client.closed?
+
+      @workers_lock.synchronize do
+        @workers.delete(Thread.current)
+      end
     end
 
     def exec_help(client)
@@ -80,8 +97,12 @@ module SpinalTap
         result = eval(code)
         client.puts(result.to_s)
       rescue Exception => e
-        client.puts("#{e.message}\r\n#{e.backtrace.join("\r\n")}")
+        client.puts(exception_to_s(e))
       end
+    end
+
+    def exception_to_s(e)
+      "#{e.message}\r\n#{e.backtrace.join("\r\n")}"
     end
   end
 end
