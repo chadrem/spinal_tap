@@ -17,6 +17,9 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency('eventmachine', ['>= 0'])
 
-  gem.add_development_dependency('rake', ['>= 0'])
+  gem.add_development_dependency('rake', ['= 0.9.2.2'])
   gem.add_development_dependency('rspec', ['= 2.11'])
+  gem.add_development_dependency('guard', ['= 1.2.3'])
+  gem.add_development_dependency('guard-rspec', ['= 1.2.0'])
+  gem.add_development_dependency('growl', ['= 1.0.3'])
 end
