@@ -1,4 +1,5 @@
 require 'socket'
+require 'debugger'
 
 module SpinalTap
 
@@ -23,16 +24,14 @@ module SpinalTap
         while true
           Thread.new(@server_sock.accept) do |client|
             begin
-              @workers_lock.synchronize do
-                @workers[Thread.current] = client
-              end
+              register(Thread.current, client)
 
-              client.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
               client.extend(SpinalTap::ClientHelpers)
+              client.setup(self)
+              client.process_loop
 
-              process(client)
             rescue Exception => e
-              puts("WORKER DIED: #{exception_to_s(e)}")
+              puts("WORKER DIED: #{e.message}\n#{e.backtrace.join("\n")}")
             end
           end
         end
@@ -56,53 +55,17 @@ module SpinalTap
       end
     end
 
-    private
-
-    def process(client)
-      client.prompt
-
-      while(line = client.gets)
-        line.chomp!
-
-        tokens = line.split(' ')
-        command = tokens.first
-
-        case command
-        when 'help' then exec_help(client)
-        when 'eval' then exec_eval(client, tokens[1..-1].join(' '))
-        when 'quit'
-          client.close
-          break
-        else
-          client.puts('Unknown command')
-        end
-
-        client.prompt
-      end
-
-    ensure
-      client.close unless client.closed?
-
+    def register(thread, client)
       @workers_lock.synchronize do
-        @workers.delete(Thread.current)
+        @workers[thread] = client
       end
     end
 
-    def exec_help(client)
-      client.puts('Commands: help quit eval')
-    end
-
-    def exec_eval(client, code)
-      begin
-        result = eval(code)
-        client.puts(result.to_s)
-      rescue Exception => e
-        client.puts(exception_to_s(e))
+    def unregister(thread)
+      @workers_lock.synchronize do
+        @workers.delete(thread)
       end
     end
 
-    def exception_to_s(e)
-      "#{e.message}\r\n#{e.backtrace.join("\r\n")}"
-    end
   end
 end
