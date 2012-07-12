@@ -8,7 +8,7 @@ module SpinalTap
       @host = params[:host] || '127.0.0.1'
       @port = params[:port] || 9000
 
-      @run = false
+      @running = false
       @workers = {}
       @workers_lock = Mutex.new
     end
