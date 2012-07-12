@@ -6,6 +6,8 @@ module SpinalTap
 
       @buffer = ''
       @cursor_pos = 1
+      @history = []
+      @history_pos = 0
 
       setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
@@ -63,7 +65,15 @@ module SpinalTap
           if (byte = getbyte) == 91 # [ Char.
             case getbyte
             when 65 # A Char - Up Arrow.
+              if @history_pos > 0
+                @history_pos -= 1
+                @buffer = @history[@history_pos].to_s
+              end
             when 66 # B Char - Down Arrow.
+              if @history_pos < @history.length
+                @history_pos += 1
+                @buffer = @history[@history_pos].to_s
+              end
             when 67 # C Char - Right Arrow.
               if @cursor_pos < @buffer.length
                 @cursor_pos += 1
@@ -83,12 +93,20 @@ module SpinalTap
           command = tokens.first
           args = tokens[1..-1]
 
+          if @buffer.length > 0
+            @history.push(@buffer)
+            @history_pos = @history.length
+          end
+
           return {:command => command, :args => args}
 
         # Other Chars.
-        else
+        elsif byte >= 32 && byte <= 126
           @buffer.insert(@cursor_pos - 1, byte_s)
           @cursor_pos += 1
+
+        # Ignore all other special characters.
+        else
         end
 
         redraw_cmd_line
