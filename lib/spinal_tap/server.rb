@@ -1,5 +1,4 @@
 require 'socket'
-require 'debugger'
 
 module SpinalTap
 
