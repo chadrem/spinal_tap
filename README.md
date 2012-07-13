@@ -1,6 +1,6 @@
-# SpinalTap
+# Spinal Tap
 
-Spinal tap lets you easily connect to running Ruby processes such as daemons and cron scripts.
+Spinal Tap lets you easily connect to running Ruby processes such as daemons and cron scripts.
 Once connected, you can execute arbitrary commands inside of your process.
 
 ## Installation
