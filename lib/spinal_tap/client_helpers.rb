@@ -4,10 +4,10 @@ module SpinalTap
     def setup(server)
       @server = server
 
-      @buffer = ''
-      @cursor_pos = 1
       @history = []
       @history_pos = 0
+
+      reset_buffer
 
       setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
@@ -40,10 +40,13 @@ module SpinalTap
       @server.unregister(Thread.current)
     end
 
-    def read_parsed_line
+    def reset_buffer
       @buffer = ''
       @cursor_pos = 1
+    end
 
+    def read_parsed_line
+      reset_buffer
       redraw_cmd_line
 
       while byte = getbyte
