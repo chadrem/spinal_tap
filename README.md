@@ -47,7 +47,7 @@ Currently no authentication exists so anyone who can connect to Spinal Tap has c
 This includes changing memory, reloading classes, killing the process, and pretty much any other nasty thing you can do with Ruby's 'eval' method.
 Use at your own risk!  You have been warned!
 
-# Contributing to Spinal Tap:
+## Contributing to Spinal Tap:
 
 1. Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 2. Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
