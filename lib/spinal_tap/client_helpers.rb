@@ -68,11 +68,13 @@ module SpinalTap
               if @history_pos > 0
                 @history_pos -= 1
                 @buffer = @history[@history_pos].to_s
+                @cursor_pos = @buffer.length + 1
               end
             when 66 # B Char - Down Arrow.
               if @history_pos < @history.length
                 @history_pos += 1
                 @buffer = @history[@history_pos].to_s
+                @cursor_pos = @buffer.length + 1
               end
             when 67 # C Char - Right Arrow.
               if @cursor_pos < @buffer.length
