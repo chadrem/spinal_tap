@@ -3,11 +3,9 @@ module SpinalTap
   module ClientHelpers
     def setup(server)
       @server = server
+      @history = SpinalTap::History.new
 
-      @history = []
-      @history_pos = 0
-
-      reset_buffer
+      reset
 
       setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
 
@@ -27,6 +25,7 @@ module SpinalTap
 
         case command
         when 'help' then exec_help
+        when 'history' then exec_history
         when 'eval' then exec_eval(args.join(' '))
         when 'quit'
           close
@@ -40,13 +39,13 @@ module SpinalTap
       @server.unregister(Thread.current)
     end
 
-    def reset_buffer
-      @buffer = ''
+    def reset
+      @buffer = @history.current
       @cursor_pos = 1
     end
 
     def read_parsed_line
-      reset_buffer
+      reset
       redraw_cmd_line
 
       while byte = getbyte
@@ -70,17 +69,15 @@ module SpinalTap
           if (byte = getbyte) == 91 # [ Char.
             case getbyte
             when 65 # A Char - Up Arrow.
-              if @history_pos > 0
-                @history_pos -= 1
-                @buffer = @history[@history_pos].to_s
+              if (result = @history.previous)
+                @buffer = result
                 @cursor_pos = @buffer.length + 1
               else
                 bell
               end
             when 66 # B Char - Down Arrow.
-              if @history_pos < @history.length
-                @history_pos += 1
-                @buffer = @history[@history_pos].to_s
+              if (result = @history.next)
+                @buffer = result
                 @cursor_pos = @buffer.length + 1
               else
                 bell
@@ -109,7 +106,7 @@ module SpinalTap
           args = tokens[1..-1]
 
           if @buffer.length > 0
-            @history_pos = @history.length
+            @history.append(@buffer)
           end
 
           return {:command => command, :args => args}
@@ -118,7 +115,6 @@ module SpinalTap
         elsif byte >= 32 && byte <= 126
           @buffer.insert(@cursor_pos - 1, byte_s)
           @cursor_pos += 1
-          @history[@history_pos] = @buffer
 
         # Ignore all other special characters.
         else
@@ -137,7 +133,13 @@ module SpinalTap
     end
 
     def exec_help
-      write("Commands: help quit eval\r\n")
+      write("Commands: help quit history eval\r\n")
+    end
+
+    def exec_history
+      @history.all.each_with_index do |entry, index|
+        write("#{index.to_s.ljust(4, ' ')} #{entry}\r\n")
+      end
     end
 
     def exec_eval(code)

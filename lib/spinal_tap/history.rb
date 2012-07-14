@@ -1,13 +1,18 @@
 module SpinalTap
 
   class History
+    MAX_LINES = 100
+
     def initialize
-      @history = []
+      @history = ['']
       @history_pos = 0
     end
 
     def current
-      return @history[@history_pos]
+      cur = @history[@history_pos]
+      cur = cur.clone unless last?
+
+      return cur
     end
 
     def previous?
@@ -36,16 +41,37 @@ module SpinalTap
       end
     end
 
+    def last?
+      return @history_pos >= @history.length - 1
+    end
+
     def append(cmd_line)
-      @history << cmd_line
-      @history_pos += 1 unless @history.length == 1
+      @history.pop
+      @history << cmd_line.clone
+      @history << ''
+
+      trim
+      fast_forward
 
       return true
     end
 
     def all
-      return @history.map { |e| e.clone }
+      return @history[0..-2].map { |e| e.clone }
+    end
+
+    def fast_forward
+      @history_pos = @history.length - 1
+
+      return current
+    end
+
+    private
+
+    def trim
+      while @history.length > MAX_LINES + 1
+        @history.shift
+      end
     end
   end
-
 end
