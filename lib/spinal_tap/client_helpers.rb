@@ -109,7 +109,6 @@ module SpinalTap
           args = tokens[1..-1]
 
           if @buffer.length > 0
-            @history.push(@buffer)
             @history_pos = @history.length
           end
 
@@ -119,6 +118,7 @@ module SpinalTap
         elsif byte >= 32 && byte <= 126
           @buffer.insert(@cursor_pos - 1, byte_s)
           @cursor_pos += 1
+          @history[@history_pos] = @buffer
 
         # Ignore all other special characters.
         else

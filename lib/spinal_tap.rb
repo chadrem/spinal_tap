@@ -1,5 +1,7 @@
 require 'spinal_tap/version'
 require 'spinal_tap/server'
+require 'spinal_tap/cmd_line'
+require 'spinal_tap/history'
 require 'spinal_tap/client_helpers'
 
 module SpinalTap
