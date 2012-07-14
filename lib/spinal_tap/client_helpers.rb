@@ -102,7 +102,7 @@ module SpinalTap
 
           return {:command => command, :args => args}
 
-        # Other Chars.
+        # Normal (letters, numbers, punctuation, etc) Chars.
         elsif byte >= 32 && byte <= 126
           @buffer.insert(@cursor_pos - 1, byte_s)
           @cursor_pos += 1
