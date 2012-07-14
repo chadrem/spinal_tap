@@ -57,6 +57,8 @@ module SpinalTap
           if @buffer.length > 0 && @cursor_pos > 1
             @cursor_pos -= 1
             @buffer.slice!(@cursor_pos - 1)
+          else
+            bell
           end
 
         # Null Char.
@@ -72,20 +74,28 @@ module SpinalTap
                 @history_pos -= 1
                 @buffer = @history[@history_pos].to_s
                 @cursor_pos = @buffer.length + 1
+              else
+                bell
               end
             when 66 # B Char - Down Arrow.
               if @history_pos < @history.length
                 @history_pos += 1
                 @buffer = @history[@history_pos].to_s
                 @cursor_pos = @buffer.length + 1
+              else
+                bell
               end
             when 67 # C Char - Right Arrow.
-              if @cursor_pos < @buffer.length
+              if @cursor_pos < @buffer.length + 1
                 @cursor_pos += 1
+              else
+                bell
               end
             when 68 # D Char - Left Arrow.
-              if @cursor_pos > 0
+              if @cursor_pos > 0 + 1
                 @cursor_pos -= 1
+              else
+                bell
               end
             end
           end
@@ -116,6 +126,10 @@ module SpinalTap
 
         redraw_cmd_line
       end
+    end
+
+    def bell
+      write([7].pack('C'))
     end
 
     def redraw_cmd_line
