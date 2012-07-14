@@ -28,7 +28,7 @@ You can then telnet into your process and type 'help' to view the default list o
 Currently, 'eval' is the main command you will use.
 For example, you can execute code such as 'eval 5 + 5' and it will return 10.
 The command set is limited, but in the future I will make it easy to add your own commands.
-For now you'll have to make your own helper class and execute them via 'eval'.
+For now you'll have to make your own helper class and execute the methods via 'eval'.
 Spinal Tap uses threads to run in the background of your process, but aware that you have full access to your processes's memory via 'eval'.
 
 SpinalTap.start accepts the following options:
