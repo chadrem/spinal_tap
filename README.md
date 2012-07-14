@@ -25,7 +25,11 @@ Start spinal at the beginning of your long running process:
 
 By default it will listen for TCP connections on 127.0.0.1:9000.
 You can then telnet into your process and type 'help' to view the default list of commands.
-Spinal Tap uses threads to run in the background of your process.
+Currently, 'eval' is the main command you will use.
+For example, you can execute code such as 'eval 5 + 5' and it will return 10.
+The command set is limited, but in the future I will make it easy to add your own commands.
+For now you'll have to make your own helper class and execute them via 'eval'.
+Spinal Tap uses threads to run in the background of your process, but aware that you have full access to your processes's memory via eval.
 
 SpinalTap.start accepts the following options:
 
@@ -40,7 +44,7 @@ You can stop the spinal tap server at any time:
 
 With great power comes great responsibility.
 Currently no authentication exists so anyone who can connect to Spinal Tap has complete control over your process.
-This includes changing memory, reloading classes, killing the process, and pretty much any other nasty thing you can with Ruby's 'eval' method.
+This includes changing memory, reloading classes, killing the process, and pretty much any other nasty thing you can do with Ruby's 'eval' method.
 Use at your own risk!  You have been warned!
 
 # Contributing to Spinal Tap:
