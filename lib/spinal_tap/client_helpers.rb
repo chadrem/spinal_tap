@@ -1,9 +1,15 @@
 module SpinalTap
+  class BindingWrapper
+    def binding
+      return Kernel.binding
+    end
+  end
 
   module ClientHelpers
     def setup(server)
       @server = server
       @history = SpinalTap::History.new
+      @binding = SpinalTap::BindingWrapper.new.binding
 
       reset_cmd_line
 
@@ -27,6 +33,7 @@ module SpinalTap
         when 'help' then exec_help
         when 'history' then exec_history
         when 'eval' then exec_eval(args.join(' '))
+        when 'counts' then exec_counts
         when 'quit'
           close
           break
@@ -133,7 +140,11 @@ module SpinalTap
     end
 
     def exec_help
-      write("Commands: help quit history eval\r\n")
+      write("Commands:\r\n")
+      write("  help   - display help information.\r\n")
+      write("  quit   - quit this session.\r\n")
+      write("  eval   - execute ruby code.\r\n")
+      write("  counts - display object counts.\r\n")
     end
 
     def exec_history
@@ -144,11 +155,26 @@ module SpinalTap
 
     def exec_eval(code)
       begin
-        result = eval(code)
+        result = eval(code, @binding)
         write("=> #{result.to_s}\r\n")
       rescue Exception => e
         write(exception_to_s(e))
       end
+    end
+
+    def exec_counts
+      GC.start
+
+      results = {}
+
+      ObjectSpace.each_object() do |o|
+        results[o.class] ||= 0
+        results[o.class] += 1
+      end
+
+      results = results.sort { |a, b|  a[1] <=> b[1] }
+
+      results.each { |e| write("#{e[0]}: #{e[1]}\r\n") }
     end
 
     def exception_to_s(e)
